@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 인증 -->
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service
+				data-source-ref="dataSource"
+				users-by-username-query="select username,password,enabled from users where username=?"
+				authorities-by-username-query="select username, authority from users where username=?" />
+			<!-- password 입력 시 지정한 빈(passwordEncoder)을 사용 할 것을 명시 해 줌 -->
+			<security:password-encoder ref="passwordEncoder"></security:password-encoder>
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<!-- 권한 부여 -->
+	<security:http auto-config="true" use-expressions="true">
+		<security:intercept-url pattern="/admin/**" access='hasRole("ROLE_ADMIN")' />
+		<security:form-login login-page="/login" authentication-failure-url="/login?error=1" />
+	</security:http>
+	
+	<bean
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" id="passwordEncoder">
+	</bean>
+</beans>

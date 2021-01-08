@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<context:property-placeholder
+		location="/WEB-INF/props/jdbc.properties" />
+
+	<context:annotation-config></context:annotation-config>
+
+	<!-- DataSource 타입 ProductDao의 setDataSource()가 호출될 때, 주입됨 (DI) -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}?serverTimezone=UTC" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- kr.ac.hansung.cse 밑에 있는 dao를 컨테이너의 bean에 등록 함 -->
+	<context:component-scan
+		base-package="kr.ac.hansung.cse.dao"></context:component-scan>
+
+	<!-- sessionFactory 빈 생성 => 나중에 DI(의존성 주입) 시킬 것  -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- bean id="dataSource"와 ref=""는 같아야 함 (sessionFactory가 id가 dataSource인 것을 사용 하겠다는 의미 -->
+		<property name="dataSource" ref="dataSource" /> 
+		<!-- @Entity 어노테이션 단 클래스들을 Entity bean으로 등록 -->
+		<property name="packagesToScan">
+			<list>
+				<value>kr.ac.hansung.cse.model</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">false</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<!-- 위의 sessionFactory bean을 사용하므로, ref에 id인 sessionFactory를 써준다 -->
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+</beans>
