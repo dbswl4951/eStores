@@ -7,11 +7,9 @@ eStores
 - 관리자 : 사진 포함 한 물품 올리기/삭제 가능
 
 
-
-사용 기능, 기술
---------------
+### 사용 기능, 기술
 - Spring MVC/Security, REST API
 - Hibernate, MySQL
 - AWS EC2
 
-
+https://i.dlpng.com/static/png/7264214_preview.png
