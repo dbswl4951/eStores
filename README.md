@@ -12,4 +12,3 @@ eStores
 - Hibernate, MySQL
 - AWS EC2
 
-https://i.dlpng.com/static/png/7264214_preview.png
